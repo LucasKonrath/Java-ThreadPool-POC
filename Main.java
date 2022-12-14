@@ -6,10 +6,7 @@ public class Main {
 
         //create queue size - 200
         //Number of threads - 4
-        ThreadPool threadPool = new ThreadPool(2,2000);
-
-        System.out.println("Stop here to test");
-
+        IThreadPool threadPool = new ThreadPool(2,2000);
         for(int i = 0; i < 1000; i++){
             threadPool.submitTask(() -> {
                 try {
