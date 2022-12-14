@@ -2,9 +2,9 @@ import java.util.concurrent.BlockingQueue;
 
 public class ThreadTaskExecutor implements Runnable {
 
-    BlockingQueue<Task> queue;
+    BlockingQueue<Runnable> queue;
 
-    public ThreadTaskExecutor(BlockingQueue<Task> queue){
+    public ThreadTaskExecutor(BlockingQueue<Runnable> queue){
         this.queue = queue;
     }
 
@@ -12,9 +12,11 @@ public class ThreadTaskExecutor implements Runnable {
     public void run() {
         do {
             try {
-                Task task = queue.poll();
-                if(task != null)
+                Runnable task = queue.poll();
+                if(task != null){
                     task.run();
+                    System.out.println("Remaining tasks: " + queue.size());
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
