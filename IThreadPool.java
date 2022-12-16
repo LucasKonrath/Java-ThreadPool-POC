@@ -1,5 +1,5 @@
-public interface IThreadPool {
+public interface IThreadPool extends AutoCloseable {
 
-    void submitTask(Runnable runnable);
+    void submitTask(Task task);
 
 }
