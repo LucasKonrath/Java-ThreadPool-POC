@@ -1,16 +1,22 @@
+package framework.runners;
+
+import framework.tasks.Task;
+
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class ThreadTaskExecutor implements Runnable {
+public class QueuedTaskRunner implements TaskRunner {
 
-    BlockingQueue<Task> queue;
+    private final BlockingQueue<Task> queue;
 
-    AtomicBoolean running = new AtomicBoolean(false);
+    private final AtomicBoolean running;
 
-    AtomicBoolean executing = new AtomicBoolean(false);
+    private final AtomicBoolean executing;
 
-    public ThreadTaskExecutor(BlockingQueue<Task> queue){
+    public QueuedTaskRunner(BlockingQueue<Task> queue){
         this.queue = queue;
+        executing = new AtomicBoolean(false);
+        running = new AtomicBoolean(false);
     }
 
     public boolean tryStop(){
@@ -23,8 +29,14 @@ public class ThreadTaskExecutor implements Runnable {
         return false;
     }
 
+
     public boolean isRunning(){
         return running.get();
+    }
+
+    @Override
+    public Task getTask() {
+        return queue.poll();
     }
 
     @Override
@@ -32,11 +44,11 @@ public class ThreadTaskExecutor implements Runnable {
         running.set(true);
         do {
             try {
-                Task task = queue.poll();
+                Task task = getTask();
                 if(task != null){
-                    executing = new AtomicBoolean(true);
+                    executing.set(true);
                     task.run();
-                    executing = new AtomicBoolean(false);
+                    executing.set(false);
                     System.out.println("Remaining tasks: " + queue.size());
                 }
             } catch (Exception e) {
